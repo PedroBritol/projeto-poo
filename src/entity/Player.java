@@ -6,7 +6,9 @@ import utils.Direction;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 public class Player extends Entity
@@ -23,6 +25,7 @@ public class Player extends Entity
         this.keyHandler = keyHandler;
 
         setDefaultValues();
+        getPlayerImage();
     }
 
     public void setDefaultValues()
@@ -47,6 +50,7 @@ public class Player extends Entity
             if (nextPosition >= 0) {
                 y = nextPosition;
             }
+            isWalking = true;
             direction = Direction.UP;
         }
         else if (keyHandler.downPressed) {
@@ -54,6 +58,7 @@ public class Player extends Entity
             if (nextPosition < screenLimitHeight) {
                 y = nextPosition;
             }
+            isWalking = true;
             direction = Direction.DOWN;
         }
         else if (keyHandler.leftPressed) {
@@ -61,6 +66,7 @@ public class Player extends Entity
             if (nextPosition >= 0) {
                 x = nextPosition;
             }
+            isWalking = true;
             direction = Direction.LEFT;
         }
         else if (keyHandler.rightPressed) {
@@ -68,13 +74,48 @@ public class Player extends Entity
             if (nextPosition <= screenLimitWidth) {
                 x = nextPosition;
             }
+            isWalking = true;
             direction = Direction.RIGHT;
+        } else {
+            isWalking = false;
+        }
+
+        sprintCounter++;
+
+        if (sprintCounter > 8 && isWalking) {
+            changeSprite = !changeSprite;
         }
     }
 
     public void draw(Graphics2D graphic2D)
     {
-        graphic2D.setColor(Color.white);
-        graphic2D.fillRect(x, y, gamePanel.tileSize, gamePanel.tileSize);
+        int spriteNumber = changeSprite ? 0 : 1;
+
+        BufferedImage image = switch (direction) {
+            case Direction.UP -> up[spriteNumber];
+            case Direction.DOWN -> down[spriteNumber];
+            case Direction.LEFT -> left[spriteNumber];
+            case Direction.RIGHT -> right[spriteNumber];
+            default -> null;
+        };
+
+        graphic2D.drawImage(image, x, y, gamePanel.tileSize, gamePanel.tileSize, null);
+
+    }
+
+    public void getPlayerImage()
+    {
+        try {
+            up[0] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/walking/boy_up_1.png")));
+            up[1] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/walking/boy_up_2.png")));
+            down[0] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/walking/boy_down_1.png")));
+            down[1] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/walking/boy_down_2.png")));
+            left[0] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/walking/boy_left_1.png")));
+            left[1] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/walking/boy_left_2.png")));
+            right[0] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/walking/boy_right_1.png")));
+            right[1] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/walking/boy_right_2.png")));
+        } catch (IOException event) {
+            event.printStackTrace();
+        }
     }
 }

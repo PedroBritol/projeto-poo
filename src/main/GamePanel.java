@@ -9,7 +9,7 @@ public class GamePanel extends JPanel implements Runnable
 {
     Thread gameThread;
     KeyHandler keyHandler = new KeyHandler();
-    public final int fps = 300;
+    public final int fps = 120;
 
     public final int tileSize = 32;
     final int maxScreenColumns = 24;
